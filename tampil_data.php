@@ -1,3 +1,30 @@
+<?php
+// Deklarasi strict types
+declare(strict_types=1);
+// memulai session
+session_start();
+
+// menampilkan pesan sesuai dengan proses yang dijalankan
+// jika pesan tersedia
+if (isset($_SESSION['pesan'])):
+?>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.notify({
+                title: '<h6 class="font-weight-bold mb-1"><?= $_SESSION['pesan']['icon']; ?><?= $_SESSION['pesan']['judul']; ?></h6>',
+                message: '<?= $_SESSION['pesan']['isi']; ?>'
+            }, {
+                type: '<?= $_SESSION['pesan']['status']; ?>',
+                allow_dismiss: false,
+            });
+        });
+    </script>
+<?php
+    // hapus pesan setelah ditampilkan
+    unset($_SESSION['pesan']);
+endif;
+?>
+
 <div class="d-flex flex-column flex-lg-row mt-5 mb-3">
     <!-- judul halaman -->
     <div class="flex-grow-1 d-flex align-items-center">
@@ -25,7 +52,7 @@
 
 <div class="d-grid gap-2 d-md-block bg-white rounded-4 shadow-sm p-4 mb-5">
     <div class="table-responsive">
-        <table id="myTable" class="table table-bordered table-striped table-hover" style="width:100%">
+        <table id="myTable" class="table table-bordered table-striped table-hover" style="width:100%;">
             <thead class="table-light">
                 <th class="text-center">No.</th>
                 <th class="text-center">Foto</th>
@@ -42,29 +69,29 @@
                 $no = 1;
                 // sql statement untuk menampilkan data dari tabel "tbl_siswa"
                 $query = $mysqli->query("SELECT id_siswa, tanggal_daftar, kelas, nama_lengkap, jenis_kelamin, foto_profil FROM tbl_siswa ORDER BY id_siswa DESC")
-                                        or die('Ada kesalahan pada query tampil data : ' . $mysqli->error);
+                                        or die("Ada kesalahan pada query tampil data : {$mysqli->error}");
                 // ambil data hasil query
                 while ($data = $query->fetch_assoc()) { ?>
                     <tr>
-                        <td width="30" class="text-center"><?php echo $no++; ?></td>
-                        <td width="50" class="text-center">
-                            <img src="images/<?php echo $data['foto_profil']; ?>" class="border border-2 img-fluid rounded-3" alt="Foto Profil" width="70" height="70">
+                        <td width="5%" class="text-center"><?= $no++ ?></td>
+                        <td width="7%" class="text-center">
+                            <img src="images/<?= basename($data['foto_profil']) ?>" class="border border-2 img-fluid rounded-3" alt="Foto Profil" width="70" height="70" loading="lazy">
                         </td>
-                        <td width="70" class="text-center"><?php echo $data['id_siswa']; ?></td>
-                        <td width="200"><?php echo $data['nama_lengkap']; ?></td>
-                        <td width="80" class="text-center"><?php echo $data['jenis_kelamin']; ?></td>
-                        <td width="80" class="text-center"><?php echo tanggal_indo($data['tanggal_daftar']); ?></td>
-                        <td width="150"><?php echo $data['kelas']; ?></td>
-                        <td width="140" class="text-center">
-                            <div>
+                        <td width="8%" class="text-center"><?= $data['id_siswa'] ?></td>
+                        <td width="24%"><?= $data['nama_lengkap'] ?></td>
+                        <td width="10%" class="text-center"><?= $data['jenis_kelamin'] ?></td>
+                        <td width="12%" class="text-center"><?= tanggal_id($data['tanggal_daftar']) ?></td>
+                        <td width="16%"><?= $data['kelas'] ?></td>
+                        <td width="16%" class="text-center">
+                            <div class="d-grid gap-2 d-md-flex justify-content-center">
                                 <!-- button form detail data -->
-                                <a href="?halaman=detail&id=<?php echo $data['id_siswa']; ?>" class="btn btn-primary btn-sm rounded-pill px-3 me-1 mb-1"> Detail </a>
+                                <a href="?halaman=detail&id=<?= $data['id_siswa'] ?>" class="btn btn-primary btn-sm rounded-pill px-3"> Detail </a>
                                 <!-- button form ubah data -->
-                                <a href="?halaman=ubah&id=<?php echo $data['id_siswa']; ?>" class="btn btn-success btn-sm rounded-pill px-3 me-1 mb-1"> Ubah </a>
+                                <a href="?halaman=ubah&id=<?= $data['id_siswa'] ?>" class="btn btn-success btn-sm rounded-pill px-3"> Ubah </a>
                                 <!-- button modal hapus data -->
-                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 mb-1" data-bs-toggle="modal" data-bs-target="#modalHapus<?php echo $data['id_siswa']; ?>"> Hapus </button>
+                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalHapus<?= $data['id_siswa'] ?>"> Hapus </button>
                                 <!-- Modal hapus data -->
-                                <div class="modal fade" id="modalHapus<?php echo $data['id_siswa']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
+                                <div class="modal fade" id="modalHapus<?= $data['id_siswa'] ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -75,12 +102,12 @@
                                             <div class="modal-body text-start">
                                                 <p class="mb-2">Anda yakin ingin menghapus data siswa?</p>
                                                 <!-- informasi data yang akan dihapus -->
-                                                <p class="fw-bold mb-2"><?php echo $data['id_siswa']; ?> <span class="fw-normal">-</span> <?php echo $data['nama_lengkap']; ?></p>
+                                                <p class="fw-bold mb-2"><?= $data['id_siswa'] ?> <span class="fw-normal">-</span> <?= $data['nama_lengkap'] ?></p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Batal</button>
                                                 <!-- button proses hapus data -->
-                                                <a href="proses_hapus.php?id=<?php echo $data['id_siswa']; ?>" class="btn btn-danger rounded-pill px-3">Ya, Hapus</a>
+                                                <a href="proses_hapus.php?id=<?= $data['id_siswa'] ?>" class="btn btn-danger rounded-pill px-3">Ya, Hapus</a>
                                             </div>
                                         </div>
                                     </div>
@@ -93,49 +120,3 @@
         </table>
     </div>
 </div>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        // dapatkan parameter URL
-        let queryString = window.location.search;
-        let urlParams = new URLSearchParams(queryString);
-        // ambil data dari URL
-        let pesan = urlParams.get('pesan');
-        let jenis = urlParams.get('jenis');
-
-        // menampilkan pesan sesuai dengan proses yang dijalankan
-        // jika pesan = 1
-        if (pesan === '1') {
-            // tampilkan pesan sukses simpan data
-            $.notify({
-                title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                message: 'Data siswa berhasil disimpan.'
-            }, {
-                type: 'success',
-		        allow_dismiss: false,
-            });
-        }
-        // jika pesan = 2
-        else if (pesan === '2') {
-            // tampilkan pesan sukses ubah data
-            $.notify({
-                title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                message: 'Data siswa berhasil diubah.'
-            }, {
-                type: 'success',
-		        allow_dismiss: false,
-            });
-        }
-        // jika pesan = 3
-        else if (pesan === '3') {
-            // tampilkan pesan sukses hapus data
-            $.notify({
-                title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                message: 'Data siswa berhasil dihapus.'
-            }, {
-                type: 'success',
-		        allow_dismiss: false,
-            });
-        }
-    });
-</script>
